@@ -52,16 +52,24 @@ class ImageManipulationController extends Controller
             $data['name'] = $image->getClientOriginalName();
             $filename = pathinfo($data['name'], PATHINFO_FILENAME);
             $extension = $image->getClientOriginalExtension();
+            $originalPath = $absolutePath . $data['name'];
 
             $image->move($absolutePath, $data['name']);
         } else {
             $data['name'] = pathinfo($image, PATHINFO_BASENAME);
             $filename = pathinfo($image, PATHINFO_FILENAME);
             $extension = pathinfo($image, PATHINFO_EXTENSION);
+            $originalPath = $absolutePath . $data['name'];
 
-            copy($image, $absolutePath . $data['name']);
+            copy($image, $originalPath);
         }
         $data['path'] = $dir . $data['name'];
+
+
+        $w = $all['w'];
+        $h = $all['h'] ?? false;
+
+        list($width, $height) = $this->getImageSize($originalPath, $w, $h);
     }
 
 
@@ -79,5 +87,9 @@ class ImageManipulationController extends Controller
     public function destroy(ImageManipulation $imageManipulation)
     {
         //
+    }
+
+    public function getImageSize (String $w, String $h, String $originalPath,) {
+        
     }
 }
