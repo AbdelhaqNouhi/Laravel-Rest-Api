@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\V1;
 
 use App\Models\Album;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAlbumRequest;
 use App\Http\Requests\UpdateAlbumRequest;
+use App\Http\Resources\V1\AlbumResource;
 
 class AlbumController extends Controller
 {
@@ -13,7 +15,7 @@ class AlbumController extends Controller
      */
     public function index()
     {
-        $albums = Album::all();
+        $albums = AlbumResource::collection(Album::paginate());
         return $albums;
     }
 
