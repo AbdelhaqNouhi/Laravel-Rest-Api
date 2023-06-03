@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ImageManipulation;
 use App\Http\Requests\ResizeImageRequest;
+use App\Http\Resources\V1\ImageManipulationResource;
 use App\Models\Album;
+use App\Models\ImageManipulation;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class ImageManipulationController extends Controller
 {
@@ -69,7 +73,10 @@ class ImageManipulationController extends Controller
         $w = $all['w'];
         $h = $all['h'] ?? false;
 
-        list($width, $height) = $this->getImageSize($originalPath, $w, $h);
+        list($width, $height) = $this->getImageSize($w, $h, $originalPath);
+
+        var_dump($width, $height);
+        die();
     }
 
 
@@ -89,7 +96,22 @@ class ImageManipulationController extends Controller
         //
     }
 
-    public function getImageSize (String $w, String $h, String $originalPath,) {
-        
+    protected function getImageSize ($w, $h, String $originalPath,)
+    {
+        $image = Image::make($originalPath);
+        $originalWidth = $image->width();
+        $originalHeight = $image->height();
+
+        if(str_ends_with($w, '%')) {
+            $ratioW = (float)str_replace('%', '', $w);
+            $ratioH = $h ? (float)str_replace('%', '', $h) : $ratioW;
+            $newWidth = $originalWidth * $ratioW / 100;
+            $newHeight = $originalHeight * $ratioH / 100;
+        } else {
+            $newWidth = (float)$w;
+            $newHeight = $h ? (float)$h : $originalHeight * $newWidth / $originalWidth;
+        }
+
+        return [$image, $newWidth, $newHeight];
     }
 }
