@@ -16,19 +16,18 @@ use App\Http\Controllers\V1\ImageManipulationController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth:sanctum')->group(function () {
 
-Route::prefix('v1')->group(function () {
-    // album routes
-    Route::apiResource('album', AlbumController::class);
 
-    // image manipulation routes
-    Route::get('image', [ImageManipulationController::class, 'index']);
-    Route::get('image/{image}', [ImageManipulationController::class, 'show']);
-    Route::get('image/by-album/{album}', [ImageManipulationController::class, 'byAlbum']);
-    Route::delete('image/{image}', [ImageManipulationController::class, 'destroy']);
-    Route::post('image/resize', [ImageManipulationController::class, 'resize']);
+    Route::prefix('v1')->group(function () {
+        // album routes
+        Route::apiResource('album', AlbumController::class);
+        // image manipulation routes
+        Route::get('image', [ImageManipulationController::class, 'index']);
+        Route::get('image/{image}', [ImageManipulationController::class, 'show']);
+        Route::get('image/by-album/{album}', [ImageManipulationController::class, 'byAlbum']);
+        Route::delete('image/{image}', [ImageManipulationController::class, 'destroy']);
+        Route::post('image/resize', [ImageManipulationController::class, 'resize']);
+    });
 });
 
