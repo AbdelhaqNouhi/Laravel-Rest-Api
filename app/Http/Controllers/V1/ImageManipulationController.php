@@ -21,12 +21,15 @@ class ImageManipulationController extends Controller
      */
     public function index()
     {
-        //
+        return ImageManipulationResource::collection(ImageManipulation::paginate());
     }
 
     public function ByAlbum(Album $album)
     {
-        //
+        $where = [
+            'album_id' => $album->id,
+        ];
+        return ImageManipulationResource::collection(ImageManipulation::where($where)->paginate());
     }
 
     /**
@@ -73,38 +76,47 @@ class ImageManipulationController extends Controller
         $w = $all['w'];
         $h = $all['h'] ?? false;
 
-        list($width, $height) = $this->getImageSize($w, $h, $originalPath);
+        $resizedFilename = $filename . '-resized.' . $extension;
 
-        var_dump($width, $height);
-        die();
+        $data['output_path'] = $dir . $resizedFilename;
+
+        $imageManipulation = ImageManipulation::create($data);
+
+        return new ImageManipulationResource($imageManipulation);
     }
 
 
     /**
      * Display the specified resource.
      */
-    public function show(ImageManipulation $imageManipulation)
+    public function show(ImageManipulation $image)
     {
-        //
+        return new ImageManipulationResource($image);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ImageManipulation $imageManipulation)
+    public function destroy(ImageManipulation $image)
     {
-        //
+        $image->delete();
+        return response()->json([
+            'message' => 'Image deleted successfully',
+        ]);
     }
 
     protected function getImageSize ($w, $h, String $originalPath,)
     {
         $image = Image::make($originalPath);
+        var_dump($image);
+        die();
         $originalWidth = $image->width();
         $originalHeight = $image->height();
 
         if(str_ends_with($w, '%')) {
             $ratioW = (float)str_replace('%', '', $w);
             $ratioH = $h ? (float)str_replace('%', '', $h) : $ratioW;
+
             $newWidth = $originalWidth * $ratioW / 100;
             $newHeight = $originalHeight * $ratioH / 100;
         } else {
